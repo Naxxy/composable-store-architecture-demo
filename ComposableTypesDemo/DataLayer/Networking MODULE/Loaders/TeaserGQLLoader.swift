@@ -16,7 +16,7 @@ class TeaserGQLLoader: TeaserLoader {
     
     var error: Swift.Error? = nil
     func load(completion: @escaping (Result<Output, Error>) -> Void) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             guard let self else { return }
             
             if let error {
