@@ -1,0 +1,28 @@
+{
+  "configurations" : [
+    {
+      "id" : "7D56CBE4-BEE6-4540-BF42-19395C0818F7",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:ComposableTypesDemo.xcodeproj",
+      "identifier" : "D9943EA72AB9D0B800084D8D",
+      "name" : "ComposableTypesDemo"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:ComposableTypesDemo.xcodeproj",
+        "identifier" : "D9943EB72AB9D0B900084D8D",
+        "name" : "ComposableTypesDemoTests"
+      }
+    }
+  ],
+  "version" : 1
+}
