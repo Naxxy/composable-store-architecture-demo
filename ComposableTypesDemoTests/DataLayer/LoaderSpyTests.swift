@@ -7,32 +7,40 @@ import XCTest
 @testable import ComposableTypesDemo
 
 final class LoaderSpyTests: XCTestCase {
+    
+    // Check that we're not making any calls before we call load() - only load(), and not init, should trigger load calls
     func test_teaserLoader_doesNotCallLoadOnInit() {
+        let sut = TeaserLoaderSpy(loader: anyTeaserAPILoader)
         let expectedMessages: [TeaserLoaderSpy.Message] = []
-        let sut = TeaserLoaderSpy(loader: TeaserAPILoader(id: anyId))
         
         XCTAssertEqual(sut.messages, expectedMessages)
     }
     
+    // Check the number of calls to make sure we're making multiple calls
     func test_teaserLoader_onlyCallsLoadOnceOnLoad() {
         let expectedId = anyId
-        var expectedMessages = [TeaserLoaderSpy.Message]()
-        let sut = TeaserLoaderSpy(loader: TeaserAPILoader(id: expectedId))
+        let sut = TeaserLoaderSpy(loader: anyTeaserAPILoader)
+        let expectedMessages: [TeaserLoaderSpy.Message] = [
+            .load(id: expectedId)
+        ]
         
-        expectedMessages.append(.load(id: expectedId))
+        sut.id = expectedId
         sut.load { _ in }
+        
         XCTAssertEqual(sut.messages, expectedMessages)
     }
     
-    func test_teaserLoader_loadsDataInCorrectOrder() {
+    // TODO: Fix the way we handle IDs - we shouldn't need to init with anyId if we're settings ids later.
+    // Check for call order to match execution order - good for race condition checks?
+    func test_teaserLoader_loadsAsynchronousRequestAfterSynchronousRequest() {
         // Given
         let firstId = 4
         let secondId = 5
-        var expectedMessages = [TeaserLoaderSpy.Message]()
-        let sut = TeaserLoaderSpy(loader: TeaserAPILoader(id: anyId))
-        
-        expectedMessages.append(.load(id: firstId))
-        expectedMessages.append(.load(id: secondId))
+        let sut = TeaserLoaderSpy(loader: anyTeaserAPILoader)
+        var expectedMessages: [TeaserLoaderSpy.Message] = [
+            .load(id: firstId),
+            .load(id: secondId)
+        ]
         
         // When
         let exp = expectation(description: "Waiting for load to complete")
@@ -49,14 +57,25 @@ final class LoaderSpyTests: XCTestCase {
         // Then
         XCTAssertEqual(sut.messages, expectedMessages)
     }
+    
+    func test_teaserLoader_loadsSynchronousRequestsInOrder() {
+        // Given
+        let firstId = 4
+        let secondId = 5
+        let sut = TeaserLoaderSpy(loader: anyTeaserAPILoader)
+        var expectedMessages: [TeaserLoaderSpy.Message] = [
+            .load(id: firstId),
+            .load(id: secondId)
+        ]
+        
+        // When
+        sut.id = firstId
+        sut.load { _ in }
+        
+        sut.id = secondId
+        sut.load { _ in }
+        
+        // Then
+        XCTAssertEqual(sut.messages, expectedMessages)
+    }
 }
-
-//extension TeaserLoader {
-//    private func loadAfterDelay(_ delay: TimeInterval, withId id: Int, completion: Bool) {
-//        let exp = expectation(description: "Waiting for load to complete")
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-//            loader.id = secondId
-//            load(completion)
-//        }
-//    }
-//}

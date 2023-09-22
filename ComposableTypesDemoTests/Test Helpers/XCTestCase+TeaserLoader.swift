@@ -81,6 +81,10 @@ extension XCTestCase {
         MapperError.urlCreationFailed("anyString")
     }
     
+    var anyTeaserAPILoader: TeaserAPILoader {
+        TeaserAPILoader(id: anyId)
+    }
+    
     func makeAPITeaser(withId id: Int) -> Teaser {
         Teaser(
             id: id,
